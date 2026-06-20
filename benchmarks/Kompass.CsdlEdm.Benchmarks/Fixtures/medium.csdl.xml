@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+  <edmx:DataServices>
+    <Schema Namespace="Medium" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+      <EntityType Name="User">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Group">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Message">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Calendar">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Event">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Drive">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="DriveItem">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Contact">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Organization">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Team">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Channel">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Chat">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Attachment">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Subscription">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Notification">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Task">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Plan">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Bucket">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Label">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <EntityType Name="Comment">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="ModifiedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="Description" Type="Edm.String" />
+      </EntityType>
+      <ComplexType Name="Address">
+        <Property Name="Street" Type="Edm.String" />
+        <Property Name="City" Type="Edm.String" />
+        <Property Name="State" Type="Edm.String" />
+        <Property Name="PostalCode" Type="Edm.String" />
+      </ComplexType>
+      <EnumType Name="Priority" IsFlags="false">
+        <Member Name="Low" Value="0" />
+        <Member Name="Normal" Value="1" />
+        <Member Name="High" Value="2" />
+        <Member Name="Urgent" Value="3" />
+      </EnumType>
+      <EntityContainer Name="Container">
+        <EntitySet Name="Users" EntityType="Medium.User" />
+        <EntitySet Name="Groups" EntityType="Medium.Group" />
+        <EntitySet Name="Messages" EntityType="Medium.Message" />
+        <EntitySet Name="Calendars" EntityType="Medium.Calendar" />
+        <EntitySet Name="Events" EntityType="Medium.Event" />
+        <EntitySet Name="Drives" EntityType="Medium.Drive" />
+        <EntitySet Name="DriveItems" EntityType="Medium.DriveItem" />
+        <EntitySet Name="Contacts" EntityType="Medium.Contact" />
+        <EntitySet Name="Organizations" EntityType="Medium.Organization" />
+        <EntitySet Name="Teams" EntityType="Medium.Team" />
+        <EntitySet Name="Channels" EntityType="Medium.Channel" />
+        <EntitySet Name="Chats" EntityType="Medium.Chat" />
+        <EntitySet Name="Attachments" EntityType="Medium.Attachment" />
+        <EntitySet Name="Subscriptions" EntityType="Medium.Subscription" />
+        <EntitySet Name="Notifications" EntityType="Medium.Notification" />
+        <EntitySet Name="Tasks" EntityType="Medium.Task" />
+        <EntitySet Name="Plans" EntityType="Medium.Plan" />
+        <EntitySet Name="Buckets" EntityType="Medium.Bucket" />
+        <EntitySet Name="Labels" EntityType="Medium.Label" />
+        <EntitySet Name="Comments" EntityType="Medium.Comment" />
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>
+

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Kompass.OData.ResponseShaping</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kompass.OData.Url\Kompass.OData.Url.csproj" />
+    <ProjectReference Include="..\Kompass.CsdlEdm\Kompass.CsdlEdm.csproj" />
+  </ItemGroup>
+
+</Project>

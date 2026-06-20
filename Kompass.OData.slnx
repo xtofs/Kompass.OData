@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Kompass.CsdlEdm/Kompass.CsdlEdm.csproj" />
+    <Project Path="src/Kompass.OData.Url/Kompass.OData.Url.csproj" />
+    <Project Path="src/Kompass.OData.Routing/Kompass.OData.Routing.csproj" />
+    <Project Path="src/Kompass.OData.Service/Kompass.OData.Service.csproj" />
+    <Project Path="src/Kompass.OData.ResponseShaping/Kompass.OData.ResponseShaping.csproj" />
+    <Project Path="src/Kompass.OData/Kompass.OData.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Kompass.CsdlEdm.Tests/Kompass.CsdlEdm.Tests.csproj" />
+    <Project Path="tests/Kompass.OData.Url.Tests/Kompass.OData.Url.Tests.csproj" />
+    <Project Path="tests/Kompass.OData.Routing.Tests/Kompass.OData.Routing.Tests.csproj" />
+    <Project Path="tests/Kompass.OData.Service.Tests/Kompass.OData.Service.Tests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Kompass.CsdlEdm.Benchmarks/Kompass.CsdlEdm.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Graph/Graph.csproj" />
+    <Project Path="samples/Rooms/Rooms.csproj" />
+  </Folder>
+</Solution>

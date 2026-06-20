@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+  <edmx:DataServices>
+    <Schema Namespace="Microsoft.Graph" Alias="Graph" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+
+      <EnumType Name="BodyType">
+        <Member Name="Text" Value="0" />
+        <Member Name="Html" Value="1" />
+      </EnumType>
+
+      <ComplexType Name="EmailAddress">
+        <Property Name="Name" Type="Edm.String" />
+        <Property Name="Address" Type="Edm.String" />
+      </ComplexType>
+
+      <ComplexType Name="ItemBody">
+        <Property Name="ContentType" Type="Microsoft.Graph.BodyType" />
+        <Property Name="Content" Type="Edm.String" />
+      </ComplexType>
+
+      <EntityType Name="DirectoryObject" Abstract="true">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="DeletedDateTime" Type="Edm.DateTimeOffset" />
+      </EntityType>
+
+      <EntityType Name="User" BaseType="Microsoft.Graph.DirectoryObject">
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="Mail" Type="Edm.String" />
+        <Property Name="UserPrincipalName" Type="Edm.String" />
+        <Property Name="JobTitle" Type="Edm.String" />
+        <Property Name="OfficeLocation" Type="Edm.String" />
+        <Property Name="MobilePhone" Type="Edm.String" />
+        <NavigationProperty Name="Messages" Type="Collection(Microsoft.Graph.Message)" ContainsTarget="true" />
+        <NavigationProperty Name="Events" Type="Collection(Microsoft.Graph.Event)" ContainsTarget="true" />
+      </EntityType>
+
+      <EntityType Name="Group" BaseType="Microsoft.Graph.DirectoryObject">
+        <Property Name="DisplayName" Type="Edm.String" />
+        <Property Name="Description" Type="Edm.String" />
+        <Property Name="MailEnabled" Type="Edm.Boolean" />
+        <Property Name="SecurityEnabled" Type="Edm.Boolean" />
+      </EntityType>
+
+      <EntityType Name="Message">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="Subject" Type="Edm.String" />
+        <Property Name="Body" Type="Microsoft.Graph.ItemBody" />
+        <Property Name="From" Type="Microsoft.Graph.EmailAddress" />
+        <Property Name="ReceivedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="IsRead" Type="Edm.Boolean" />
+      </EntityType>
+
+      <EntityType Name="Event">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="Subject" Type="Edm.String" />
+        <Property Name="Body" Type="Microsoft.Graph.ItemBody" />
+        <Property Name="Start" Type="Edm.DateTimeOffset" />
+        <Property Name="End" Type="Edm.DateTimeOffset" />
+        <Property Name="Location" Type="Edm.String" />
+        <Property Name="IsAllDay" Type="Edm.Boolean" />
+      </EntityType>
+
+      <EntityType Name="Drive">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="Name" Type="Edm.String" />
+        <Property Name="DriveType" Type="Edm.String" />
+        <NavigationProperty Name="Items" Type="Collection(Microsoft.Graph.DriveItem)" ContainsTarget="true" />
+      </EntityType>
+
+      <EntityType Name="DriveItem">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="Name" Type="Edm.String" />
+        <Property Name="Size" Type="Edm.Int64" />
+        <Property Name="WebUrl" Type="Edm.String" />
+        <Property Name="CreatedDateTime" Type="Edm.DateTimeOffset" />
+        <Property Name="LastModifiedDateTime" Type="Edm.DateTimeOffset" />
+      </EntityType>
+
+      <EntityContainer Name="GraphService">
+        <EntitySet Name="Users" EntityType="Microsoft.Graph.User" />
+        <EntitySet Name="Groups" EntityType="Microsoft.Graph.Group" />
+        <EntitySet Name="Drives" EntityType="Microsoft.Graph.Drive" />
+      </EntityContainer>
+
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

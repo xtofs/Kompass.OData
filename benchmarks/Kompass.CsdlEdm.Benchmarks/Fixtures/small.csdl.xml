@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+  <edmx:DataServices>
+    <Schema Namespace="Small" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+      <EntityType Name="Customer">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="Name" Type="Edm.String" />
+        <Property Name="Email" Type="Edm.String" />
+        <NavigationProperty Name="Orders" Type="Collection(Small.Order)" ContainsTarget="true" />
+      </EntityType>
+      <EntityType Name="Order">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="Amount" Type="Edm.Decimal" />
+        <Property Name="Date" Type="Edm.DateTimeOffset" />
+      </EntityType>
+      <EntityType Name="Product">
+        <Key><PropertyRef Name="Id" /></Key>
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="Name" Type="Edm.String" />
+        <Property Name="Price" Type="Edm.Decimal" />
+      </EntityType>
+      <EntityContainer Name="Container">
+        <EntitySet Name="Customers" EntityType="Small.Customer" />
+        <EntitySet Name="Products" EntityType="Small.Product" />
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

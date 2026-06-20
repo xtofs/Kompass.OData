@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Kompass.OData.Samples.Graph</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kompass.OData\Kompass.OData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="graph.csdl.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

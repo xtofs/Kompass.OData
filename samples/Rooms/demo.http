@@ -1,0 +1,14 @@
+@base = http://localhost:5000
+# @base = https://localhost:5001
+
+GET {{base}}
+
+
+###
+GET {{base}}/rooms
+
+###
+GET {{base}}/rooms/oak-204
+
+###
+GET {{base}}/rooms(oak-204)

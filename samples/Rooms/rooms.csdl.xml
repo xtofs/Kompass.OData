@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+  <edmx:DataServices>
+    <Schema Namespace="BuildingManagement" Alias="Bm" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+
+      <EntityType Name="Room">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="Name" Type="Edm.String" />
+        <NavigationProperty Name="Printers" Type="Collection(BuildingManagement.Printer)" ContainsTarget="true" />
+        <NavigationProperty Name="Phones" Type="Collection(BuildingManagement.Phone)" ContainsTarget="true" />
+      </EntityType>
+
+      <EntityType Name="Printer">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="Model" Type="Edm.String" />
+      </EntityType>
+
+      <EntityType Name="Phone">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="Id" Type="Edm.String" Nullable="false" />
+        <Property Name="Model" Type="Edm.String" />
+        <Property Name="Number" Type="Edm.String" />
+      </EntityType>
+
+      <EntityContainer Name="Container">
+        <EntitySet Name="Rooms" EntityType="BuildingManagement.Room" />
+      </EntityContainer>
+
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>
