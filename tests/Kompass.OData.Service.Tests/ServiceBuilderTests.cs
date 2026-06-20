@@ -3,6 +3,7 @@ namespace Kompass.OData.Service.Tests;
 using Microsoft.AspNetCore.Http;
 using Kompass.OData.Service;
 using Xunit;
+using System.Text;
 
 public class ServiceBuilderTests
 {
@@ -69,7 +70,7 @@ public class ServiceBuilderTests
     }
 
     [Fact]
-    public void DetectsUnregisteredContainedNavs()
+    public void DetectsUnregisteredContainedNavigationProperties()
     {
         var builder = ODataServiceBuilder.FromCsdl(RoomsCsdl);
         builder.EntitySet("Rooms", es => es
@@ -108,14 +109,28 @@ public class ServiceBuilderTests
     }
 
     [Fact]
-    public void GeneratesServiceDocument()
+    public async Task GeneratesServiceDocument()
     {
         var builder = ODataServiceBuilder.FromCsdl(RoomsCsdl);
         builder.EntitySet("Rooms", es => es
             .OnList((ctx, sp) => Task.FromResult<IResult>(Results.Ok())));
 
-        var doc = builder.GenerateServiceDocument("https://localhost:5000");
-        Assert.Contains("Rooms", doc);
-        Assert.Contains("EntitySet", doc);
+        var doc = builder.GenerateServiceDocument();
+        Assert.Contains("Rooms", await SerializeResultAsync(doc));
+        Assert.Contains("EntitySet", await SerializeResultAsync(doc));
+    }
+
+
+    private static async Task<string> SerializeResultAsync(IResult result)
+    {
+        var httpContext = new DefaultHttpContext();
+        using var stream = new MemoryStream();
+        httpContext.Response.Body = stream;
+
+        await result.ExecuteAsync(httpContext);
+
+        stream.Position = 0;
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return await reader.ReadToEndAsync();
     }
 }

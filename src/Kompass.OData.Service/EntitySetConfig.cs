@@ -13,7 +13,7 @@ public sealed class EntitySetConfig<TState>
     internal Func<CollectionContext, TState, Task<IResult>>? CreateHandler { get; private set; }
     internal Func<EntityContext, TState, Task<IResult>>? UpdateHandler { get; private set; }
     internal Func<EntityContext, TState, Task<IResult>>? DeleteHandler { get; private set; }
-    internal Dictionary<string, ContainedNavConfig<TState>> ContainedNavs { get; } = new Dictionary<string, ContainedNavConfig<TState>>();
+    internal Dictionary<string, ContainedNavConfig<TState>> ContainedNavigationProperties { get; } = new Dictionary<string, ContainedNavConfig<TState>>();
 
     public EntitySetConfig<TState> OnList(Func<CollectionContext, TState, Task<IResult>> handler)
     {
@@ -48,7 +48,7 @@ public sealed class EntitySetConfig<TState>
     public EntitySetConfig<TState> ContainedCollection(string navPropName, Func<ContainedNavConfig<TState>, ContainedNavConfig<TState>> configure)
     {
         var config = new ContainedNavConfig<TState>();
-        ContainedNavs[navPropName] = configure(config);
+        ContainedNavigationProperties[navPropName] = configure(config);
         return this;
     }
 }

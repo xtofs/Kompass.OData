@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Kompass.CsdlEdm.Edm;
 using Kompass.OData.Routing;
 using Kompass.OData.Service.Contexts;
+using Kompass.OData.Url;
 
 /// <summary>
 /// Static factory methods for creating <see cref="ODataServiceBuilder{TState}"/> instances.
@@ -59,8 +60,8 @@ public static class ODataServiceBuilder
 public sealed class ODataServiceBuilder<TState> where TState : notnull
 {
     private readonly SchemaView _schema;
-    private readonly Dictionary<string, EntitySetConfig<TState>> _configs = new Dictionary<string, EntitySetConfig<TState>>();
-    private readonly List<string> _warnings = new List<string>();
+    private readonly Dictionary<string, EntitySetConfig<TState>> _configs = [];
+    private readonly List<string> _warnings = [];
 
     private ODataServiceBuilder(SchemaView schema)
     {
@@ -98,7 +99,7 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
         var entityType = _schema.FindEntityType(esView.EntityTypeName);
         if (entityType is not null)
         {
-            foreach (var navName in config.ContainedNavs.Keys)
+            foreach (var navName in config.ContainedNavigationProperties.Keys)
             {
                 var found = false;
                 foreach (var nav in entityType.ContainedNavigationProperties)
@@ -123,7 +124,7 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
     }
 
     /// <summary>
-    /// Get warnings about unregistered entity sets or contained navigations.
+    /// Get warnings about unregistered entity sets or contained navigation properties.
     /// </summary>
     public IReadOnlyList<string> GetWarnings()
     {
@@ -143,7 +144,7 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                     var config = _configs[es.Name];
                     foreach (var nav in entityType.ContainedNavigationProperties)
                     {
-                        if (!config.ContainedNavs.ContainsKey(nav.Name))
+                        if (!config.ContainedNavigationProperties.ContainsKey(nav.Name))
                         {
                             warnings.Add(
                                 $"Contained navigation '{nav.Name}' on entity set '{es.Name}' has no registered handlers.");
@@ -163,6 +164,8 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
     /// </summary>
     public void MapODataEndpoints(IEndpointRouteBuilder endpoints)
     {
+        var contextUrls = ContextUrlBuilder.Default;
+
         foreach (var (entitySetName, config) in _configs)
         {
             var esName = entitySetName;
@@ -177,7 +180,8 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                 {
                     var state = ResolveState(ctx.RequestServices);
                     var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}";
+                    var shape = BuildCollectionShape(rawQuery);
+                    var contextUrl = contextUrls.ForEntitySet(esName, shape);
                     var context = new CollectionContext(esName, rawQuery, ctx.Request.Body, contextUrl);
                     return await handler(context, state);
                 });
@@ -191,7 +195,8 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                 {
                     var state = ResolveState(ctx.RequestServices);
                     var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}";
+                    var shape = BuildCollectionShape(rawQuery);
+                    var contextUrl = contextUrls.ForEntitySet(esName, shape);
                     var context = new CollectionContext(esName, rawQuery, ctx.Request.Body, contextUrl);
                     return await handler(context, state);
                 });
@@ -205,22 +210,19 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                 var handler = config.GetHandler;
                 var sentinelPattern = $"/{esName}/{key}/{{id}}";
                 var segmentPattern = $"/{esName}/{{id}}";
-                endpoints.MapGet(sentinelPattern, async (HttpContext ctx, string id) =>
+
+                async Task<IResult> GetHandler(HttpContext ctx, string id)
                 {
                     var state = ResolveState(ctx.RequestServices);
                     var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}/$entity";
+                    var shape = BuildEntityShape(rawQuery);
+                    var contextUrl = contextUrls.ForEntitySet(esName, shape);
                     var context = new EntityContext(esName, id, rawQuery, ctx.Request.Body, contextUrl);
                     return await handler(context, state);
-                });
-                endpoints.MapGet(segmentPattern, async (HttpContext ctx, string id) =>
-                {
-                    var state = ResolveState(ctx.RequestServices);
-                    var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}/$entity";
-                    var context = new EntityContext(esName, id, rawQuery, ctx.Request.Body, contextUrl);
-                    return await handler(context, state);
-                });
+                }
+
+                endpoints.MapGet(sentinelPattern, GetHandler);
+                endpoints.MapGet(segmentPattern, GetHandler);
             }
 
             if (config.UpdateHandler is not null)
@@ -228,22 +230,19 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                 var handler = config.UpdateHandler;
                 var sentinelPattern = $"/{esName}/{key}/{{id}}";
                 var segmentPattern = $"/{esName}/{{id}}";
-                endpoints.MapPatch(sentinelPattern, async (HttpContext ctx, string id) =>
+
+                async Task<IResult> UpdateHandler(HttpContext ctx, string id)
                 {
                     var state = ResolveState(ctx.RequestServices);
                     var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}/$entity";
+                    var shape = BuildEntityShape(rawQuery);
+                    var contextUrl = contextUrls.ForEntitySet(esName, shape);
                     var context = new EntityContext(esName, id, rawQuery, ctx.Request.Body, contextUrl);
                     return await handler(context, state);
-                });
-                endpoints.MapPatch(segmentPattern, async (HttpContext ctx, string id) =>
-                {
-                    var state = ResolveState(ctx.RequestServices);
-                    var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}/$entity";
-                    var context = new EntityContext(esName, id, rawQuery, ctx.Request.Body, contextUrl);
-                    return await handler(context, state);
-                });
+                }
+
+                endpoints.MapPatch(sentinelPattern, UpdateHandler);
+                endpoints.MapPatch(segmentPattern, UpdateHandler);
             }
 
             if (config.DeleteHandler is not null)
@@ -251,47 +250,44 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                 var handler = config.DeleteHandler;
                 var sentinelPattern = $"/{esName}/{key}/{{id}}";
                 var segmentPattern = $"/{esName}/{{id}}";
-                endpoints.MapDelete(sentinelPattern, async (HttpContext ctx, string id) =>
+
+                async Task<IResult> DeleteHandler(HttpContext ctx, string id)
                 {
                     var state = ResolveState(ctx.RequestServices);
                     var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}/$entity";
+                    var shape = BuildEntityShape(rawQuery);
+                    var contextUrl = contextUrls.ForEntitySet(esName, shape);
                     var context = new EntityContext(esName, id, rawQuery, Stream.Null, contextUrl);
                     return await handler(context, state);
-                });
-                endpoints.MapDelete(segmentPattern, async (HttpContext ctx, string id) =>
-                {
-                    var state = ResolveState(ctx.RequestServices);
-                    var rawQuery = ExtractRawQuery(ctx);
-                    var contextUrl = $"$metadata#{esName}/$entity";
-                    var context = new EntityContext(esName, id, rawQuery, Stream.Null, contextUrl);
-                    return await handler(context, state);
-                });
+                }
+
+                endpoints.MapDelete(sentinelPattern, DeleteHandler);
+                endpoints.MapDelete(segmentPattern, DeleteHandler);
             }
 
             // Contained navigation routes (also dual-registered)
-            foreach (var (navName, navConfig) in config.ContainedNavs)
+            foreach (var (navName, navConfig) in config.ContainedNavigationProperties)
             {
                 var nav = navName;
 
                 if (navConfig.ListHandler is not null)
                 {
                     var handler = navConfig.ListHandler;
+                    var sentinelPattern = $"/{esName}/{key}/{{parentId}}/{nav}";
+                    var segmentPattern = $"/{esName}/{{parentId}}/{nav}";
 
-                    async Task<IResult> Handler (HttpContext ctx, string parentId) 
+                    async Task<IResult> ListHandler(HttpContext ctx, string parentId)
                     {
                         var state = ResolveState(ctx.RequestServices);
                         var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}";
+                        var shape = BuildCollectionShape(rawQuery);
+                        var contextUrl = contextUrls.ForContainedNavigation(esName, nav, shape);
                         var context = new ContainedCollectionContext(esName, parentId, nav, rawQuery, ctx.Request.Body, contextUrl);
                         return await handler(context, state);
                     }
 
-                    var sentinelPattern = $"/{esName}/{key}/{{parentId}}/{nav}";
-                    var segmentPattern = $"/{esName}/{{parentId}}/{nav}";
-
-                    endpoints.MapGet(sentinelPattern, Handler);
-                    endpoints.MapGet(segmentPattern, Handler);
+                    endpoints.MapGet(sentinelPattern, ListHandler);
+                    endpoints.MapGet(segmentPattern, ListHandler);
                 }
 
                 if (navConfig.CreateHandler is not null)
@@ -299,22 +295,19 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                     var handler = navConfig.CreateHandler;
                     var sentinelPattern = $"/{esName}/{key}/{{parentId}}/{nav}";
                     var segmentPattern = $"/{esName}/{{parentId}}/{nav}";
-                    endpoints.MapPost(sentinelPattern, async (HttpContext ctx, string parentId) =>
+
+                    async Task<IResult> CreateHandler(HttpContext ctx, string parentId)
                     {
                         var state = ResolveState(ctx.RequestServices);
                         var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}";
+                        var shape = BuildCollectionShape(rawQuery);
+                        var contextUrl = contextUrls.ForContainedNavigation(esName, nav, shape);
                         var context = new ContainedCollectionContext(esName, parentId, nav, rawQuery, ctx.Request.Body, contextUrl);
                         return await handler(context, state);
-                    });
-                    endpoints.MapPost(segmentPattern, async (HttpContext ctx, string parentId) =>
-                    {
-                        var state = ResolveState(ctx.RequestServices);
-                        var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}";
-                        var context = new ContainedCollectionContext(esName, parentId, nav, rawQuery, ctx.Request.Body, contextUrl);
-                        return await handler(context, state);
-                    });
+                    }
+
+                    endpoints.MapPost(sentinelPattern, CreateHandler);
+                    endpoints.MapPost(segmentPattern, CreateHandler);
                 }
 
                 if (navConfig.GetHandler is not null)
@@ -322,22 +315,19 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                     var handler = navConfig.GetHandler;
                     var sentinelPattern = $"/{esName}/{key}/{{parentId}}/{nav}/{key}/{{navId}}";
                     var segmentPattern = $"/{esName}/{{parentId}}/{nav}/{{navId}}";
-                    endpoints.MapGet(sentinelPattern, async (HttpContext ctx, string parentId, string navId) =>
+
+                    async Task<IResult> GetHandler(HttpContext ctx, string parentId, string navId)
                     {
                         var state = ResolveState(ctx.RequestServices);
                         var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}/$entity";
+                        var shape = BuildEntityShape(rawQuery);
+                        var contextUrl = contextUrls.ForContainedNavigation(esName, nav, shape);
                         var context = new ContainedEntityContext(esName, parentId, nav, navId, rawQuery, ctx.Request.Body, contextUrl);
                         return await handler(context, state);
-                    });
-                    endpoints.MapGet(segmentPattern, async (HttpContext ctx, string parentId, string navId) =>
-                    {
-                        var state = ResolveState(ctx.RequestServices);
-                        var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}/$entity";
-                        var context = new ContainedEntityContext(esName, parentId, nav, navId, rawQuery, ctx.Request.Body, contextUrl);
-                        return await handler(context, state);
-                    });
+                    }
+
+                    endpoints.MapGet(sentinelPattern, GetHandler);
+                    endpoints.MapGet(segmentPattern, GetHandler);
                 }
 
                 if (navConfig.UpdateHandler is not null)
@@ -345,22 +335,19 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                     var handler = navConfig.UpdateHandler;
                     var sentinelPattern = $"/{esName}/{key}/{{parentId}}/{nav}/{key}/{{navId}}";
                     var segmentPattern = $"/{esName}/{{parentId}}/{nav}/{{navId}}";
-                    endpoints.MapPatch(sentinelPattern, async (HttpContext ctx, string parentId, string navId) =>
+
+                    async Task<IResult> UpdateHandler(HttpContext ctx, string parentId, string navId)
                     {
                         var state = ResolveState(ctx.RequestServices);
                         var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}/$entity";
+                        var shape = BuildEntityShape(rawQuery);
+                        var contextUrl = contextUrls.ForContainedNavigation(esName, nav, shape);
                         var context = new ContainedEntityContext(esName, parentId, nav, navId, rawQuery, ctx.Request.Body, contextUrl);
                         return await handler(context, state);
-                    });
-                    endpoints.MapPatch(segmentPattern, async (HttpContext ctx, string parentId, string navId) =>
-                    {
-                        var state = ResolveState(ctx.RequestServices);
-                        var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}/$entity";
-                        var context = new ContainedEntityContext(esName, parentId, nav, navId, rawQuery, ctx.Request.Body, contextUrl);
-                        return await handler(context, state);
-                    });
+                    }
+
+                    endpoints.MapPatch(sentinelPattern, UpdateHandler);
+                    endpoints.MapPatch(segmentPattern, UpdateHandler);
                 }
 
                 if (navConfig.DeleteHandler is not null)
@@ -368,22 +355,19 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                     var handler = navConfig.DeleteHandler;
                     var sentinelPattern = $"/{esName}/{key}/{{parentId}}/{nav}/{key}/{{navId}}";
                     var segmentPattern = $"/{esName}/{{parentId}}/{nav}/{{navId}}";
-                    endpoints.MapDelete(sentinelPattern, async (HttpContext ctx, string parentId, string navId) =>
+
+                    async Task<IResult> DeleteHandler(HttpContext ctx, string parentId, string navId)
                     {
                         var state = ResolveState(ctx.RequestServices);
                         var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}/$entity";
+                        var shape = BuildEntityShape(rawQuery);
+                        var contextUrl = contextUrls.ForContainedNavigation(esName, nav, shape);
                         var context = new ContainedEntityContext(esName, parentId, nav, navId, rawQuery, Stream.Null, contextUrl);
                         return await handler(context, state);
-                    });
-                    endpoints.MapDelete(segmentPattern, async (HttpContext ctx, string parentId, string navId) =>
-                    {
-                        var state = ResolveState(ctx.RequestServices);
-                        var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}/$entity";
-                        var context = new ContainedEntityContext(esName, parentId, nav, navId, rawQuery, Stream.Null, contextUrl);
-                        return await handler(context, state);
-                    });
+                    }
+
+                    endpoints.MapDelete(sentinelPattern, DeleteHandler);
+                    endpoints.MapDelete(segmentPattern, DeleteHandler);
                 }
             }
         }
@@ -400,9 +384,37 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
     }
 
     /// <summary>
+    /// Build a collection <see cref="SerializationShape"/>, incorporating $select if present.
+    /// </summary>
+    private static SerializationShape BuildCollectionShape(string rawQuery)
+    {
+        var select = QueryOptions.Parse(rawQuery).Select;
+        if (select is { Items.Count: > 0 })
+        {
+            return SerializationShape.CollectionWithSelect(select.Items);
+        }
+
+        return SerializationShape.Collection;
+    }
+
+    /// <summary>
+    /// Build an entity <see cref="SerializationShape"/>, incorporating $select if present.
+    /// </summary>
+    private static SerializationShape BuildEntityShape(string rawQuery)
+    {
+        var select = QueryOptions.Parse(rawQuery).Select;
+        if (select is { Items.Count: > 0 })
+        {
+            return SerializationShape.EntityWithSelect(select.Items);
+        }
+
+        return SerializationShape.Entity;
+    }
+
+    /// <summary>
     /// Generate OData service document JSON listing all entity sets.
     /// </summary>
-    public IResult GenerateServiceDocument(string baseUrl)
+    public IResult GenerateServiceDocument()
     {
         var entitySets = _schema.EntitySets.Select(es => new
         {
@@ -421,7 +433,7 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
 
     public void MapServiceDocumentEndpoint(WebApplication app, string v)
     {
-        var doc = this.GenerateServiceDocument("https://localhost:5000");
+        var doc = this.GenerateServiceDocument();
         
         app.MapGet("/", () => doc);
 

@@ -9,8 +9,8 @@ using Kompass.OData.Service.Contexts;
 public static class Program
 {
     // In-memory data
-    private static readonly List<JsonObject> Users = new List<JsonObject>
-    {
+    private static readonly List<JsonObject> Users =
+    [
         new JsonObject
         {
             ["Id"] = "u1",
@@ -34,16 +34,16 @@ public static class Program
             ["Messages"] = new JsonArray(),
             ["Events"] = new JsonArray(),
         },
-    };
+    ];
 
-    private static readonly List<JsonObject> Groups = new List<JsonObject>
-    {
+    private static readonly List<JsonObject> Groups =
+    [
         new JsonObject { ["Id"] = "g1", ["DisplayName"] = "Engineering", ["MailEnabled"] = true, ["SecurityEnabled"] = true },
         new JsonObject { ["Id"] = "g2", ["DisplayName"] = "Marketing", ["MailEnabled"] = true, ["SecurityEnabled"] = false },
-    };
+    ];
 
-    private static readonly List<JsonObject> Drives = new List<JsonObject>
-    {
+    private static readonly List<JsonObject> Drives =
+    [
         new JsonObject
         {
             ["Id"] = "d1",
@@ -53,7 +53,7 @@ public static class Program
                 new JsonObject { ["Id"] = "di1", ["Name"] = "Document.docx", ["Size"] = 1024 },
                 new JsonObject { ["Id"] = "di2", ["Name"] = "Spreadsheet.xlsx", ["Size"] = 2048 }),
         },
-    };
+    ];
 
     public static void Main(string[] args)
     {
@@ -85,10 +85,8 @@ public static class Program
         app.UseRouting();
         service.MapODataEndpoints(app);
 
-        app.MapGet("/", () => Results.Content(
-            service.GenerateServiceDocument("https://localhost:5000"),
-            "application/json"));
 
+        app.MapGet("/", () => service.GenerateServiceDocument());
         app.Lifetime.ApplicationStarted.Register(() => app.PrintRegisteredRoutes());
         app.Run();
     }
@@ -119,7 +117,7 @@ public static class Program
         var parent = Users.FirstOrDefault(u => u["Id"]?.GetValue<string>() == ctx.ParentKey);
         if (parent is null) { return Task.FromResult(ctx.NotFound()); }
 
-        var messages = parent["Messages"]?.AsArray() ?? new JsonArray();
+        var messages = parent["Messages"]?.AsArray() ?? [];
         return Task.FromResult(ctx.Ok(messages.Select(m => (object)(m?.DeepClone()!))));
     }
 
@@ -141,7 +139,7 @@ public static class Program
         var parent = Users.FirstOrDefault(u => u["Id"]?.GetValue<string>() == ctx.ParentKey);
         if (parent is null) { return Task.FromResult(ctx.NotFound()); }
 
-        var events = parent["Events"]?.AsArray() ?? new JsonArray();
+        var events = parent["Events"]?.AsArray() ?? [];
         return Task.FromResult(ctx.Ok(events.Select(e => (object)(e?.DeepClone()!))));
     }
 
@@ -201,7 +199,7 @@ public static class Program
         var parent = Drives.FirstOrDefault(d => d["Id"]?.GetValue<string>() == ctx.ParentKey);
         if (parent is null) { return Task.FromResult(ctx.NotFound()); }
 
-        var items = parent["Items"]?.AsArray() ?? new JsonArray();
+        var items = parent["Items"]?.AsArray() ?? [];
         return Task.FromResult(ctx.Ok(items.Select(i => (object)(i?.DeepClone()!))));
     }
 
