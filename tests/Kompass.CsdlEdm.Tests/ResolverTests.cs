@@ -24,8 +24,7 @@ public class ResolverTests
         Assert.Equal("BuildingManagement", schema.Namespace);
 
         var entityTypes = schema.Elements
-            .OfType<SchemaElement.EntityTypeElement>()
-            .Select(e => e.EntityType)
+            .OfType<EntityType>()
             .ToList();
 
         Assert.Equal(3, entityTypes.Count);
@@ -46,8 +45,7 @@ public class ResolverTests
         var schema = model.Schemas[0];
 
         var entityType = schema.Elements
-            .OfType<SchemaElement.EntityTypeElement>()
-            .Select(e => e.EntityType)
+            .OfType<EntityType>()
             .First(et => et.Name == typeName);
 
         Assert.Equal(expectedKeyCount, entityType.Keys.Count);
@@ -66,8 +64,7 @@ public class ResolverTests
         var schema = model.Schemas[0];
 
         var room = schema.Elements
-            .OfType<SchemaElement.EntityTypeElement>()
-            .Select(e => e.EntityType)
+            .OfType<EntityType>()
             .First(et => et.Name == "Room");
 
         Assert.Equal(2, room.NavigationProperties.Count);
@@ -95,10 +92,10 @@ public class ResolverTests
         Assert.Equal("Container", schema.EntityContainer!.Name);
         Assert.Single(schema.EntityContainer.Elements);
 
-        var esElem = schema.EntityContainer.Elements[0] as EntityContainerElement.EntitySetElement;
+        var esElem = schema.EntityContainer.Elements[0] as EntitySet;
         Assert.NotNull(esElem);
-        Assert.Equal("Rooms", esElem!.EntitySet.Name);
-        Assert.Equal("Room", esElem.EntitySet.Target.Name);
+        Assert.Equal("Rooms", esElem!.Name);
+        Assert.Equal("Room", esElem.Target.Name);
     }
 
     [Fact]
@@ -110,13 +107,12 @@ public class ResolverTests
         var schema = model.Schemas[0];
 
         var room = schema.Elements
-            .OfType<SchemaElement.EntityTypeElement>()
-            .Select(e => e.EntityType)
+            .OfType<EntityType>()
             .First(et => et.Name == "Room");
 
         var idProp = room.Properties.First(p => p.Name == "Id");
-        Assert.IsType<ResolvedType.Primitive>(idProp.Type);
-        Assert.Equal(PrimitiveType.String, ((ResolvedType.Primitive)idProp.Type).Type);
+        Assert.IsType<PrimitiveType>(idProp.Type);
+        Assert.Equal(PrimitiveType.String, idProp.Type);
     }
 
     [Fact]
@@ -145,8 +141,7 @@ public class ResolverTests
         var schema = model.Schemas[0];
 
         var employee = schema.Elements
-            .OfType<SchemaElement.EntityTypeElement>()
-            .Select(e => e.EntityType)
+            .OfType<EntityType>()
             .First(et => et.Name == "Employee");
 
         Assert.NotNull(employee.BaseType);
@@ -214,13 +209,12 @@ public class ResolverTests
         var schema = model.Schemas[0];
 
         var person = schema.Elements
-            .OfType<SchemaElement.EntityTypeElement>()
-            .Select(e => e.EntityType)
+            .OfType<EntityType>()
             .First(et => et.Name == "Person");
 
         var homeProp = person.Properties.First(p => p.Name == "Home");
-        Assert.IsType<ResolvedType.Complex>(homeProp.Type);
-        var complexType = ((ResolvedType.Complex)homeProp.Type).Type;
+        Assert.IsType<ComplexType>(homeProp.Type);
+        var complexType = (ComplexType)homeProp.Type;
         Assert.Equal("Address", complexType.Name);
         Assert.Equal(3, complexType.Properties.Count);
     }

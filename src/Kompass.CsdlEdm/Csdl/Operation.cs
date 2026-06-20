@@ -3,9 +3,9 @@ namespace Kompass.CsdlEdm.Csdl;
 /// <summary>
 /// A CSDL Function declaration.
 /// </summary>
-public sealed class Function
+public sealed class Function : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public bool? IsBound { get; set; }
     public bool? IsComposable { get; set; }
     public string? EntitySetPath { get; set; }
@@ -17,9 +17,9 @@ public sealed class Function
 /// <summary>
 /// A CSDL Action declaration.
 /// </summary>
-public sealed class Action
+public sealed class Action : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public bool? IsBound { get; set; }
     public string? EntitySetPath { get; set; }
     public List<Parameter> Parameters { get; set; } = [];

@@ -146,31 +146,31 @@ public static class CsdlJsonReader
             {
                 case "EntityType":
                     var et = ReadEntityType(prop.Name, prop.Value);
-                    schema.Elements.Add(new SchemaElement.EntityTypeElement { Name = et.Name, EntityType = et });
+                    schema.Elements.Add(et);
                     break;
                 case "ComplexType":
                     var ct = ReadComplexType(prop.Name, prop.Value);
-                    schema.Elements.Add(new SchemaElement.ComplexTypeElement { Name = ct.Name, ComplexType = ct });
+                    schema.Elements.Add(ct);
                     break;
                 case "EnumType":
                     var enumT = ReadEnumType(prop.Name, prop.Value);
-                    schema.Elements.Add(new SchemaElement.EnumTypeElement { Name = enumT.Name, EnumType = enumT });
+                    schema.Elements.Add(enumT);
                     break;
                 case "TypeDefinition":
                     var td = ReadTypeDefinition(prop.Name, prop.Value);
-                    schema.Elements.Add(new SchemaElement.TypeDefinitionElement { Name = td.Name, TypeDefinition = td });
+                    schema.Elements.Add(td);
                     break;
                 case "Term":
                     var term = ReadTerm(prop.Name, prop.Value);
-                    schema.Elements.Add(new SchemaElement.TermElement { Name = term.Name, Term = term });
+                    schema.Elements.Add(term);
                     break;
                 case "Action":
                     var action = ReadAction(prop.Name, prop.Value);
-                    schema.Elements.Add(new SchemaElement.ActionElement { Name = action.Name, Action = action });
+                    schema.Elements.Add(action);
                     break;
                 case "EntityContainer":
                     var container = ReadEntityContainer(prop.Name, prop.Value);
-                    schema.Elements.Add(new SchemaElement.EntityContainerElement { Name = container.Name, EntityContainer = container });
+                    schema.Elements.Add(container);
                     break;
                 default:
                     // Function is the default $Kind, or explicitly "Function"
@@ -183,7 +183,7 @@ public static class CsdlJsonReader
                             kind == "Function")
                         {
                             var func = ReadFunction(prop.Name, prop.Value);
-                            schema.Elements.Add(new SchemaElement.FunctionElement { Name = func.Name, Function = func });
+                            schema.Elements.Add(func);
                         }
                     }
                     break;

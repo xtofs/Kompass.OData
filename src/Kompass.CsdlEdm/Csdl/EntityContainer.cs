@@ -3,9 +3,9 @@ namespace Kompass.CsdlEdm.Csdl;
 /// <summary>
 /// A CSDL EntityContainer declaration.
 /// </summary>
-public sealed class EntityContainer
+public sealed class EntityContainer : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public string? Extends { get; set; }
     public List<EntitySet> EntitySets { get; set; } = [];
     public List<Singleton> Singletons { get; set; } = [];

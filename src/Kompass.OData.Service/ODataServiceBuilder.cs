@@ -161,7 +161,7 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
     /// Registers dual routes (standard + rewrite-style) for each operation.
     /// <typeparamref name="TState"/> is resolved from DI on each request.
     /// </summary>
-    public void Build(IEndpointRouteBuilder endpoints)
+    public void MapODataEndpoints(IEndpointRouteBuilder endpoints)
     {
         foreach (var (entitySetName, config) in _configs)
         {
@@ -277,24 +277,21 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
                 if (navConfig.ListHandler is not null)
                 {
                     var handler = navConfig.ListHandler;
+
+                    async Task<IResult> Handler (HttpContext ctx, string parentId) 
+                    {
+                        var state = ResolveState(ctx.RequestServices);
+                        var rawQuery = ExtractRawQuery(ctx);
+                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}";
+                        var context = new ContainedCollectionContext(esName, parentId, nav, rawQuery, ctx.Request.Body, contextUrl);
+                        return await handler(context, state);
+                    }
+
                     var sentinelPattern = $"/{esName}/{key}/{{parentId}}/{nav}";
                     var segmentPattern = $"/{esName}/{{parentId}}/{nav}";
-                    endpoints.MapGet(sentinelPattern, async (HttpContext ctx, string parentId) =>
-                    {
-                        var state = ResolveState(ctx.RequestServices);
-                        var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}";
-                        var context = new ContainedCollectionContext(esName, parentId, nav, rawQuery, ctx.Request.Body, contextUrl);
-                        return await handler(context, state);
-                    });
-                    endpoints.MapGet(segmentPattern, async (HttpContext ctx, string parentId) =>
-                    {
-                        var state = ResolveState(ctx.RequestServices);
-                        var rawQuery = ExtractRawQuery(ctx);
-                        var contextUrl = $"$metadata#{esName}('{parentId}')/{nav}";
-                        var context = new ContainedCollectionContext(esName, parentId, nav, rawQuery, ctx.Request.Body, contextUrl);
-                        return await handler(context, state);
-                    });
+
+                    endpoints.MapGet(sentinelPattern, Handler);
+                    endpoints.MapGet(segmentPattern, Handler);
                 }
 
                 if (navConfig.CreateHandler is not null)
@@ -405,7 +402,7 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
     /// <summary>
     /// Generate OData service document JSON listing all entity sets.
     /// </summary>
-    public string GenerateServiceDocument(string baseUrl)
+    public IResult GenerateServiceDocument(string baseUrl)
     {
         var entitySets = _schema.EntitySets.Select(es => new
         {
@@ -419,10 +416,14 @@ public sealed class ODataServiceBuilder<TState> where TState : notnull
             value = entitySets,
         };
 
-        return JsonSerializer.Serialize(doc, new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        });
+        return Results.Json(doc);
+    }
+
+    public void MapServiceDocumentEndpoint(WebApplication app, string v)
+    {
+        var doc = this.GenerateServiceDocument("https://localhost:5000");
+        
+        app.MapGet("/", () => doc);
+
     }
 }

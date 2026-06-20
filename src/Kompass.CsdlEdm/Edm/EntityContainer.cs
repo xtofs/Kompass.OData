@@ -10,39 +10,19 @@ public sealed class EntityContainer
 }
 
 /// <summary>
-/// A resolved element within an entity container. Sealed hierarchy.
+/// A resolved element within an entity container.
 /// </summary>
 public abstract class EntityContainerElement
 {
-    private EntityContainerElement() { }
-
-    public sealed class EntitySetElement(EntitySet EntitySet) : EntityContainerElement
-    {
-        public EntitySet EntitySet { get; } = EntitySet;
-    }
-
-    public sealed class SingletonElement(Singleton Singleton) : EntityContainerElement
-    {
-        public Singleton Singleton { get; } = Singleton;
-    }
-
-    public sealed class FunctionImportElement(FunctionImport FunctionImport) : EntityContainerElement
-    {
-        public FunctionImport FunctionImport { get; } = FunctionImport;
-    }
-
-    public sealed class ActionImportElement(ActionImport ActionImport) : EntityContainerElement
-    {
-        public ActionImport ActionImport { get; } = ActionImport;
-    }
+    public virtual string Name { get; init; } = "";
 }
 
 /// <summary>
 /// A resolved entity set. Target is a direct reference to the resolved EntityType.
 /// </summary>
-public sealed class EntitySet
+public sealed class EntitySet : EntityContainerElement
 {
-    public required string Name { get; init; }
+    public required override string Name { get; init; }
     public required EntityType Target { get; init; }
     public List<NavigationPropertyBinding> NavigationPropertyBindings { get; set; } = [];
 }
@@ -50,9 +30,9 @@ public sealed class EntitySet
 /// <summary>
 /// A resolved singleton. Target is a direct reference to the resolved EntityType.
 /// </summary>
-public sealed class Singleton
+public sealed class Singleton : EntityContainerElement
 {
-    public required string Name { get; init; }
+    public required override string Name { get; init; }
     public required EntityType Target { get; init; }
     public List<NavigationPropertyBinding> NavigationPropertyBindings { get; set; } = [];
 }
@@ -60,9 +40,9 @@ public sealed class Singleton
 /// <summary>
 /// A resolved function import.
 /// </summary>
-public sealed class FunctionImport
+public sealed class FunctionImport : EntityContainerElement
 {
-    public required string Name { get; init; }
+    public required override string Name { get; init; }
     public required string Function { get; init; }
     public IReadOnlyList<BindingPathSegment>? EntitySet { get; init; }
 }
@@ -70,9 +50,9 @@ public sealed class FunctionImport
 /// <summary>
 /// A resolved action import.
 /// </summary>
-public sealed class ActionImport
+public sealed class ActionImport : EntityContainerElement
 {
-    public required string Name { get; init; }
+    public required override string Name { get; init; }
     public required string Action { get; init; }
     public IReadOnlyList<BindingPathSegment>? EntitySet { get; init; }
 }

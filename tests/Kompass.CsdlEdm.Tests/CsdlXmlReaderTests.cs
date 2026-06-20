@@ -29,13 +29,13 @@ public class CsdlXmlReaderTests
         // 3 entity types + 1 container = 4 elements
         Assert.Equal(4, schema.Elements.Count);
 
-        var room = schema.Elements.OfType<SchemaElement.EntityTypeElement>()
+        var room = schema.Elements.OfType<EntityType>()
             .First(e => e.Name == "Room");
-        Assert.NotNull(room.EntityType.Key);
-        Assert.Single(room.EntityType.Key!.PropertyRefs);
-        Assert.Equal("Id", room.EntityType.Key.PropertyRefs[0].Name);
-        Assert.Equal(2, room.EntityType.Properties.Count);
-        Assert.Equal(2, room.EntityType.NavigationProperties.Count);
+        Assert.NotNull(room.Key);
+        Assert.Single(room.Key!.PropertyRefs);
+        Assert.Equal("Id", room.Key.PropertyRefs[0].Name);
+        Assert.Equal(2, room.Properties.Count);
+        Assert.Equal(2, room.NavigationProperties.Count);
     }
 
     [Theory]
@@ -48,11 +48,11 @@ public class CsdlXmlReaderTests
         var doc = CsdlXmlReader.Read(xml);
         var schema = doc.Edmx!.Schemas[0];
 
-        var entityType = schema.Elements.OfType<SchemaElement.EntityTypeElement>()
+        var entityType = schema.Elements.OfType<EntityType>()
             .First(e => e.Name == typeName);
 
-        Assert.Equal(propCount, entityType.EntityType.Properties.Count);
-        Assert.Equal(navCount, entityType.EntityType.NavigationProperties.Count);
+        Assert.Equal(propCount, entityType.Properties.Count);
+        Assert.Equal(navCount, entityType.NavigationProperties.Count);
     }
 
     [Fact]
@@ -62,10 +62,10 @@ public class CsdlXmlReaderTests
         var doc = CsdlXmlReader.Read(xml);
         var schema = doc.Edmx!.Schemas[0];
 
-        var room = schema.Elements.OfType<SchemaElement.EntityTypeElement>()
+        var room = schema.Elements.OfType<EntityType>()
             .First(e => e.Name == "Room");
 
-        var printers = room.EntityType.NavigationProperties.First(n => n.Name == "Printers");
+        var printers = room.NavigationProperties.First(n => n.Name == "Printers");
         Assert.True(printers.ContainsTarget);
         Assert.True(printers.IsCollection);
         Assert.Equal("BuildingManagement.Printer", printers.TypeName);
@@ -78,12 +78,12 @@ public class CsdlXmlReaderTests
         var doc = CsdlXmlReader.Read(xml);
         var schema = doc.Edmx!.Schemas[0];
 
-        var container = schema.Elements.OfType<SchemaElement.EntityContainerElement>()
+        var container = schema.Elements.OfType<EntityContainer>()
             .First();
         Assert.Equal("Container", container.Name);
-        Assert.Single(container.EntityContainer.EntitySets);
-        Assert.Equal("Rooms", container.EntityContainer.EntitySets[0].Name);
-        Assert.Equal("BuildingManagement.Room", container.EntityContainer.EntitySets[0].EntityType);
+        Assert.Single(container.EntitySets);
+        Assert.Equal("Rooms", container.EntitySets[0].Name);
+        Assert.Equal("BuildingManagement.Room", container.EntitySets[0].EntityType);
     }
 
     [Theory]
@@ -118,13 +118,13 @@ public class CsdlXmlReaderTests
 
         var doc = CsdlXmlReader.Read(xml);
         var schema = doc.Edmx!.Schemas[0];
-        var enumElem = schema.Elements.OfType<SchemaElement.EnumTypeElement>().First();
+        var enumElem = schema.Elements.OfType<EnumType>().First();
 
         Assert.Equal("Color", enumElem.Name);
-        Assert.True(enumElem.EnumType.IsFlags);
-        Assert.Equal(3, enumElem.EnumType.Members.Count);
-        Assert.Equal("Red", enumElem.EnumType.Members[0].Name);
-        Assert.Equal(1, enumElem.EnumType.Members[0].Value);
+        Assert.True(enumElem.IsFlags);
+        Assert.Equal(3, enumElem.Members.Count);
+        Assert.Equal("Red", enumElem.Members[0].Name);
+        Assert.Equal(1, enumElem.Members[0].Value);
     }
 
     [Fact]
@@ -150,19 +150,19 @@ public class CsdlXmlReaderTests
         var doc = CsdlXmlReader.Read(xml);
         var schema = doc.Edmx!.Schemas[0];
 
-        var func = schema.Elements.OfType<SchemaElement.FunctionElement>().First();
+        var func = schema.Elements.OfType<Function>().First();
         Assert.Equal("GetTopProducts", func.Name);
-        Assert.True(func.Function.IsBound);
-        Assert.False(func.Function.IsComposable);
-        Assert.Single(func.Function.Parameters);
-        Assert.Equal("count", func.Function.Parameters[0].Name);
-        Assert.NotNull(func.Function.ReturnType);
-        Assert.True(func.Function.ReturnType!.IsCollection);
-        Assert.Equal("Test.Product", func.Function.ReturnType.TypeName);
+        Assert.True(func.IsBound);
+        Assert.False(func.IsComposable);
+        Assert.Single(func.Parameters);
+        Assert.Equal("count", func.Parameters[0].Name);
+        Assert.NotNull(func.ReturnType);
+        Assert.True(func.ReturnType!.IsCollection);
+        Assert.Equal("Test.Product", func.ReturnType.TypeName);
 
-        var action = schema.Elements.OfType<SchemaElement.ActionElement>().First();
+        var action = schema.Elements.OfType<Action>().First();
         Assert.Equal("ResetData", action.Name);
-        Assert.False(action.Action.IsBound);
-        Assert.NotNull(action.Action.ReturnType);
+        Assert.False(action.IsBound);
+        Assert.NotNull(action.ReturnType);
     }
 }

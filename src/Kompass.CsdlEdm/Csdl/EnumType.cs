@@ -3,9 +3,9 @@ namespace Kompass.CsdlEdm.Csdl;
 /// <summary>
 /// A CSDL EnumType declaration.
 /// </summary>
-public sealed class EnumType
+public sealed class EnumType : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public string? UnderlyingType { get; set; }
     public bool? IsFlags { get; set; }
     public List<EnumMember> Members { get; set; } = [];
@@ -25,9 +25,9 @@ public sealed class EnumMember
 /// <summary>
 /// A CSDL TypeDefinition — a named alias for a primitive type with optional facets.
 /// </summary>
-public sealed class TypeDefinition
+public sealed class TypeDefinition : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public required string UnderlyingType { get; set; }
     public MaxLengthFacet? MaxLength { get; set; }
     public string? Precision { get; set; }
@@ -40,9 +40,9 @@ public sealed class TypeDefinition
 /// <summary>
 /// A CSDL Term declaration.
 /// </summary>
-public sealed class Term
+public sealed class Term : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public string? TypeName { get; set; }
     public bool IsCollection { get; set; }
     public string? BaseTerm { get; set; }

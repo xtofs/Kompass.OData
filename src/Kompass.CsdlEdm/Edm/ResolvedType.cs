@@ -1,68 +1,14 @@
 namespace Kompass.CsdlEdm.Edm;
 
 /// <summary>
-/// A resolved type reference: primitive, enum, complex, or type-definition.
-/// Modeled as a sealed hierarchy.
+/// Marker for types that can be the target of a structural property type reference.
+/// Implemented by <see cref="PrimitiveType"/>, <see cref="ComplexType"/>,
+/// <see cref="EnumType"/>, and <see cref="TypeDefinition"/>.
 /// </summary>
-public abstract class ResolvedType
-{
-    private ResolvedType() { }
-
-    public sealed class Primitive(PrimitiveType Type) : ResolvedType
-    {
-        public PrimitiveType Type { get; } = Type;
-        public override string ToString() => $"Edm.{Type}";
-    }
-
-    public sealed class Enum(EnumType Type) : ResolvedType
-    {
-        public EnumType Type { get; } = Type;
-        public override string ToString() => Type.Name;
-    }
-
-    public sealed class Complex(ComplexType Type) : ResolvedType
-    {
-        public ComplexType Type { get; } = Type;
-        public override string ToString() => Type.Name;
-    }
-
-    public sealed class TypeDef(TypeDefinition Type) : ResolvedType
-    {
-        public TypeDefinition Type { get; } = Type;
-        public override string ToString() => Type.Name;
-    }
-}
+public interface IPropertyType { }
 
 /// <summary>
-/// A resolved type reference that can also be an entity type.
-/// Used for Term types and operation parameter/return types.
+/// Marker for types that can be the target of a term, operation parameter, or return type reference.
+/// Extends <see cref="IPropertyType"/> with <see cref="EntityType"/>.
 /// </summary>
-public abstract class TermType
-{
-    private TermType() { }
-
-    public sealed class Primitive(PrimitiveType Type) : TermType
-    {
-        public PrimitiveType Type { get; } = Type;
-    }
-
-    public sealed class TypeDef(TypeDefinition Type) : TermType
-    {
-        public TypeDefinition Type { get; } = Type;
-    }
-
-    public sealed class Enum(EnumType Type) : TermType
-    {
-        public EnumType Type { get; } = Type;
-    }
-
-    public sealed class Complex(ComplexType Type) : TermType
-    {
-        public ComplexType Type { get; } = Type;
-    }
-
-    public sealed class Entity(EntityType Type) : TermType
-    {
-        public EntityType Type { get; } = Type;
-    }
-}
+public interface ITermType { }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 /// <summary>
 /// ASP.NET Core middleware that rewrites OData subsegment-key URLs into segment form
@@ -93,14 +94,15 @@ public static class ODataRoutingExtensions
         return context.Items[typeof(OriginalODataUri)] as OriginalODataUri;
     }
 
+
     /// <summary>
-    /// Returns all registered routes formatted as OData-style URLs.
+    /// Prints all registered OData routes to the console.
     /// Routes with <c>__key__</c> sentinels are converted to parenthesized OData key notation.
     /// Must be called after all routes are registered (e.g. in ApplicationStarted).
     /// </summary>
-    public static IReadOnlyList<ODataRouteInfo> GetODataRoutes(this WebApplication app)
+    public static void PrintRegisteredRoutes(this WebApplication app)
     {
-        var routes = new List<ODataRouteInfo>();
+         var routes = new List<ODataRouteInfo>();
 
         foreach (var dataSource in app.Services.GetRequiredService<IEnumerable<EndpointDataSource>>())
         {
@@ -119,24 +121,19 @@ public static class ODataRoutingExtensions
             }
         }
 
-        return routes;
-    }
+        var note =  string.Join(Environment.NewLine, routes.Select(r => $"{r.Methods} {r.Path}"));
 
-    /// <summary>
-    /// Prints all registered OData routes to the console.
-    /// Must be called after all routes are registered (e.g. in ApplicationStarted).
-    /// </summary>
-    public static void PrintODataRoutes(this WebApplication app)
-    {
-        Console.WriteLine("Registered OData routes:");
-        foreach (var route in app.GetODataRoutes())
-        {
-            Console.WriteLine($"  {route.Method,-7} {route.Path}");
-        }
+        app.Logger.LogInformation("Registered routes:{nl}{note}", Environment.NewLine,note);
+
+        // Console.WriteLine("Registered routes:");
+        // foreach (var route in routes)
+        // {
+        //     logger.LogInformation("  {methods,-7} {path}", route.Methods, route.Path);
+        // }
     }
 }
 
 /// <summary>
 /// Describes a registered OData route with its HTTP method and path.
 /// </summary>
-public sealed record ODataRouteInfo(string Method, string Path);
+public sealed record ODataRouteInfo(string Methods, string Path);

@@ -96,29 +96,29 @@ public static class Resolver
         {
             switch (element)
             {
-                case Csdl.SchemaElement.EntityTypeElement ete:
-                    ctx.RegisterEntityType(ete.EntityType);
+                case Csdl.EntityType ete:
+                    ctx.RegisterEntityType(ete);
                     break;
-                case Csdl.SchemaElement.ComplexTypeElement cte:
-                    ctx.RegisterComplexType(cte.ComplexType);
+                case Csdl.ComplexType cte:
+                    ctx.RegisterComplexType(cte);
                     break;
-                case Csdl.SchemaElement.EnumTypeElement ete2:
-                    ctx.RegisterEnumType(ete2.EnumType);
+                case Csdl.EnumType ete2:
+                    ctx.RegisterEnumType(ete2);
                     break;
-                case Csdl.SchemaElement.TypeDefinitionElement tde:
-                    ctx.RegisterTypeDefinition(tde.TypeDefinition);
+                case Csdl.TypeDefinition tde:
+                    ctx.RegisterTypeDefinition(tde);
                     break;
-                case Csdl.SchemaElement.TermElement te:
-                    ctx.RegisterTerm(te.Term);
+                case Csdl.Term te:
+                    ctx.RegisterTerm(te);
                     break;
-                case Csdl.SchemaElement.FunctionElement fe:
-                    ctx.RegisterFunction(fe.Function);
+                case Csdl.Function fe:
+                    ctx.RegisterFunction(fe);
                     break;
-                case Csdl.SchemaElement.ActionElement ae:
-                    ctx.RegisterAction(ae.Action);
+                case Csdl.Action ae:
+                    ctx.RegisterAction(ae);
                     break;
-                case Csdl.SchemaElement.EntityContainerElement ece:
-                    ctx.RegisterEntityContainer(ece.EntityContainer);
+                case Csdl.EntityContainer ece:
+                    ctx.RegisterEntityContainer(ece);
                     break;
             }
         }
@@ -177,7 +177,7 @@ public static class Resolver
             };
             _entityTypes[csdl.Name] = edm;
             _entityTypesPending.Add((csdl, edm));
-            _elements.Add(new Edm.SchemaElement.EntityTypeElement(edm));
+            _elements.Add(edm);
         }
 
         public void RegisterComplexType(Csdl.ComplexType csdl)
@@ -189,7 +189,7 @@ public static class Resolver
             };
             _complexTypes[csdl.Name] = edm;
             _complexTypesPending.Add((csdl, edm));
-            _elements.Add(new Edm.SchemaElement.ComplexTypeElement(edm));
+            _elements.Add(edm);
         }
 
         public void RegisterEnumType(Csdl.EnumType csdl)
@@ -200,7 +200,7 @@ public static class Resolver
                 Members = csdl.Members.Select(m => new Edm.EnumMember { Name = m.Name, Value = m.Value }).ToList(),
             };
             _enumTypes[csdl.Name] = edm;
-            _elements.Add(new Edm.SchemaElement.EnumTypeElement(edm));
+            _elements.Add(edm);
         }
 
         public void RegisterTypeDefinition(Csdl.TypeDefinition csdl)
@@ -216,7 +216,7 @@ public static class Resolver
                 UnderlyingType = primitiveType,
             };
             _typeDefinitions[csdl.Name] = edm;
-            _elements.Add(new Edm.SchemaElement.TypeDefinitionElement(edm));
+            _elements.Add(edm);
         }
 
         public void RegisterTerm(Csdl.Term csdl)
@@ -228,7 +228,7 @@ public static class Resolver
             };
             _terms[csdl.Name] = edm;
             _termsPending.Add((csdl, edm));
-            _elements.Add(new Edm.SchemaElement.TermElement(edm));
+            _elements.Add(edm);
         }
 
         public void RegisterFunction(Csdl.Function csdl)
@@ -241,7 +241,7 @@ public static class Resolver
             };
             _functions[csdl.Name] = edm;
             _functionsPending.Add((csdl, edm));
-            _elements.Add(new Edm.SchemaElement.FunctionElement(edm));
+            _elements.Add(edm);
         }
 
         public void RegisterAction(Csdl.Action csdl)
@@ -253,7 +253,7 @@ public static class Resolver
             };
             _actions[csdl.Name] = edm;
             _actionsPending.Add((csdl, edm));
-            _elements.Add(new Edm.SchemaElement.ActionElement(edm));
+            _elements.Add(edm);
         }
 
         public void RegisterEntityContainer(Csdl.EntityContainer csdl)
@@ -363,9 +363,9 @@ public static class Resolver
                     result.Add(new KeyPathSegment.PropertySegment(prop));
 
                     // If the property is a complex type, descend into it
-                    if (prop.Type is Edm.ResolvedType.Complex complex)
+                    if (prop.Type is Edm.ComplexType complex)
                     {
-                        allProperties = GetAllProperties(complex.Type);
+                        allProperties = GetAllProperties(complex);
                     }
                 }
                 else
@@ -405,7 +405,7 @@ public static class Resolver
         {
             var resolvedType = csdl.TypeName is not null
                 ? ResolveType(csdl.TypeName)
-                : new Edm.ResolvedType.Primitive(Edm.PrimitiveType.String);
+                : Edm.PrimitiveType.String;
 
             return new Edm.Property
             {
@@ -529,7 +529,7 @@ public static class Resolver
                 }
 
                 var edmEs = new Edm.EntitySet { Name = es.Name, Target = target };
-                container.Elements.Add(new Edm.EntityContainerElement.EntitySetElement(edmEs));
+                container.Elements.Add(edmEs);
             }
 
             foreach (var s in csdl.Singletons)
@@ -544,7 +544,7 @@ public static class Resolver
                 }
 
                 var edmS = new Edm.Singleton { Name = s.Name, Target = target };
-                container.Elements.Add(new Edm.EntityContainerElement.SingletonElement(edmS));
+                container.Elements.Add(edmS);
             }
 
             foreach (var fi in csdl.FunctionImports)
@@ -554,7 +554,7 @@ public static class Resolver
                     Name = fi.Name,
                     Function = fi.Function ?? "",
                 };
-                container.Elements.Add(new Edm.EntityContainerElement.FunctionImportElement(edmFi));
+                container.Elements.Add(edmFi);
             }
 
             foreach (var ai in csdl.ActionImports)
@@ -564,7 +564,7 @@ public static class Resolver
                     Name = ai.Name,
                     Action = ai.Action ?? "",
                 };
-                container.Elements.Add(new Edm.EntityContainerElement.ActionImportElement(edmAi));
+                container.Elements.Add(edmAi);
             }
 
             return container;
@@ -578,11 +578,11 @@ public static class Resolver
             {
                 switch (elem)
                 {
-                    case Edm.EntityContainerElement.EntitySetElement ese:
-                        containerElementsByName[ese.EntitySet.Name] = ese.EntitySet;
+                    case Edm.EntitySet ese:
+                        containerElementsByName[ese.Name] = ese;
                         break;
-                    case Edm.EntityContainerElement.SingletonElement se:
-                        containerElementsByName[se.Singleton.Name] = se.Singleton;
+                    case Edm.Singleton se:
+                        containerElementsByName[se.Name] = se;
                         break;
                 }
             }
@@ -591,9 +591,8 @@ public static class Resolver
             for (var i = 0; i < csdlContainer.EntitySets.Count; i++)
             {
                 var csdlEs = csdlContainer.EntitySets[i];
-                var edmEs = ((Edm.EntityContainerElement.EntitySetElement)edmContainer.Elements
-                    .First(e => e is Edm.EntityContainerElement.EntitySetElement ese && ese.EntitySet.Name == csdlEs.Name))
-                    .EntitySet;
+                var edmEs = (Edm.EntitySet)edmContainer.Elements
+                    .First(e => e is Edm.EntitySet ese && ese.Name == csdlEs.Name);
 
                 edmEs.NavigationPropertyBindings = csdlEs.NavigationPropertyBindings
                     .Select(nb => ResolveBinding(nb, edmEs.Target, containerElementsByName))
@@ -604,9 +603,8 @@ public static class Resolver
             for (var i = 0; i < csdlContainer.Singletons.Count; i++)
             {
                 var csdlS = csdlContainer.Singletons[i];
-                var edmS = ((Edm.EntityContainerElement.SingletonElement)edmContainer.Elements
-                    .First(e => e is Edm.EntityContainerElement.SingletonElement se && se.Singleton.Name == csdlS.Name))
-                    .Singleton;
+                var edmS = (Edm.Singleton)edmContainer.Elements
+                    .First(e => e is Edm.Singleton se && se.Name == csdlS.Name);
 
                 edmS.NavigationPropertyBindings = csdlS.NavigationPropertyBindings
                     .Select(nb => ResolveBinding(nb, edmS.Target, containerElementsByName))
@@ -714,29 +712,29 @@ public static class Resolver
 
         // --- Type resolution helpers ---
 
-        private Edm.ResolvedType ResolveType(string typeName)
+        private Edm.IPropertyType ResolveType(string typeName)
         {
             // Check primitives first
             if (PrimitiveTypes.TryGetValue(typeName, out var primitive))
             {
-                return new Edm.ResolvedType.Primitive(primitive);
+                return primitive;
             }
 
             var name = StripNamespace(typeName);
 
             if (_enumTypes.TryGetValue(name, out var enumType))
             {
-                return new Edm.ResolvedType.Enum(enumType);
+                return enumType;
             }
 
             if (_complexTypes.TryGetValue(name, out var complexType))
             {
-                return new Edm.ResolvedType.Complex(complexType);
+                return complexType;
             }
 
             if (_typeDefinitions.TryGetValue(name, out var typeDef))
             {
-                return new Edm.ResolvedType.TypeDef(typeDef);
+                return typeDef;
             }
 
             // Check entity types too (some models reference entity types in properties)
@@ -744,7 +742,7 @@ public static class Resolver
             {
                 // Entity types shouldn't appear as structural property types,
                 // but we don't want to crash. Return as string-typed.
-                return new Edm.ResolvedType.Primitive(Edm.PrimitiveType.String);
+                return Edm.PrimitiveType.String;
             }
 
             throw new UnknownTypeException(typeName);
@@ -767,33 +765,33 @@ public static class Resolver
             return _complexTypes.GetValueOrDefault(name);
         }
 
-        private Edm.TermType ResolveTermTypeRef(string typeName)
+        private Edm.ITermType ResolveTermTypeRef(string typeName)
         {
             if (PrimitiveTypes.TryGetValue(typeName, out var primitive))
             {
-                return new Edm.TermType.Primitive(primitive);
+                return primitive;
             }
 
             var name = StripNamespace(typeName);
 
             if (_entityTypes.TryGetValue(name, out var entityType))
             {
-                return new Edm.TermType.Entity(entityType);
+                return entityType;
             }
 
             if (_complexTypes.TryGetValue(name, out var complexType))
             {
-                return new Edm.TermType.Complex(complexType);
+                return complexType;
             }
 
             if (_enumTypes.TryGetValue(name, out var enumType))
             {
-                return new Edm.TermType.Enum(enumType);
+                return enumType;
             }
 
             if (_typeDefinitions.TryGetValue(name, out var typeDef))
             {
-                return new Edm.TermType.TypeDef(typeDef);
+                return typeDef;
             }
 
             throw new UnknownTypeException(typeName);

@@ -51,44 +51,9 @@ public sealed class Model
 }
 
 /// <summary>
-/// A resolved schema element. Modeled as a sealed hierarchy.
+/// A resolved schema element.
 /// </summary>
 public abstract class SchemaElement
 {
-    private SchemaElement() { }
-
-    public sealed class EntityTypeElement(EntityType EntityType) : SchemaElement
-    {
-        public EntityType EntityType { get; } = EntityType;
-    }
-
-    public sealed class ComplexTypeElement(ComplexType ComplexType) : SchemaElement
-    {
-        public ComplexType ComplexType { get; } = ComplexType;
-    }
-
-    public sealed class EnumTypeElement(EnumType EnumType) : SchemaElement
-    {
-        public EnumType EnumType { get; } = EnumType;
-    }
-
-    public sealed class TypeDefinitionElement(TypeDefinition TypeDefinition) : SchemaElement
-    {
-        public TypeDefinition TypeDefinition { get; } = TypeDefinition;
-    }
-
-    public sealed class TermElement(Term Term) : SchemaElement
-    {
-        public Term Term { get; } = Term;
-    }
-
-    public sealed class FunctionElement(Function Function) : SchemaElement
-    {
-        public Function Function { get; } = Function;
-    }
-
-    public sealed class ActionElement(Action Action) : SchemaElement
-    {
-        public Action Action { get; } = Action;
-    }
+    public virtual string Name { get; init; } = "";
 }

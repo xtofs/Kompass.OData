@@ -3,9 +3,9 @@ namespace Kompass.CsdlEdm.Csdl;
 /// <summary>
 /// A CSDL EntityType declaration (syntactic / unresolved).
 /// </summary>
-public sealed class EntityType
+public sealed class EntityType : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public string? BaseType { get; set; }
     public bool? Abstract { get; set; }
     public bool? OpenType { get; set; }
@@ -19,9 +19,9 @@ public sealed class EntityType
 /// <summary>
 /// A CSDL ComplexType declaration (syntactic / unresolved).
 /// </summary>
-public sealed class ComplexType
+public sealed class ComplexType : SchemaElement
 {
-    public required string Name { get; set; }
+    public required override string Name { get; set; }
     public string? BaseType { get; set; }
     public bool? Abstract { get; set; }
     public bool? OpenType { get; set; }

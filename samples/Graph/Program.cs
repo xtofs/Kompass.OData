@@ -83,13 +83,13 @@ public static class Program
 
         app.UseODataPathRewriteWithRouting();
         app.UseRouting();
-        service.Build(app);
+        service.MapODataEndpoints(app);
 
         app.MapGet("/", () => Results.Content(
             service.GenerateServiceDocument("https://localhost:5000"),
             "application/json"));
 
-        app.Lifetime.ApplicationStarted.Register(() => app.PrintODataRoutes());
+        app.Lifetime.ApplicationStarted.Register(() => app.PrintRegisteredRoutes());
         app.Run();
     }
 

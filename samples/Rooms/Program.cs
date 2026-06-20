@@ -15,6 +15,10 @@ public static class Program
         var app = builder.Build();
 
 
+        app.UseODataPathRewriteWithRouting();
+        app.UseRouting();
+
+
 
         var csdlXml = File.ReadAllText("rooms.csdl.xml");
 
@@ -34,15 +38,12 @@ public static class Program
             Console.WriteLine($"Warning: {warning}");
         }
 
-        app.UseODataPathRewriteWithRouting();
-        app.UseRouting();
-        service.Build(app);
+        service.MapServiceDocumentEndpoint(app, "/");
 
-        app.MapGet("/", () => Results.Content(
-            service.GenerateServiceDocument("https://localhost:5000"),
-            "application/json"));
+        service.MapODataEndpoints(app);
 
-        app.Lifetime.ApplicationStarted.Register(() => app.PrintODataRoutes());
+
+        app.Lifetime.ApplicationStarted.Register(() => app.PrintRegisteredRoutes());
         app.Run();
     }
 

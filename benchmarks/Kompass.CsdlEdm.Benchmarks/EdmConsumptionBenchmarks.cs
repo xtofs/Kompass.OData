@@ -25,9 +25,9 @@ public class EdmConsumptionBenchmarks
     {
         foreach (var element in _schema.Elements)
         {
-            if (element is SchemaElement.EntityTypeElement ete && ete.EntityType.Name == "Entity50")
+            if (element is EntityType et && et.Name == "Entity50")
             {
-                return ete.EntityType;
+                return et;
             }
         }
         return null;
@@ -39,9 +39,9 @@ public class EdmConsumptionBenchmarks
         var count = 0;
         foreach (var element in _schema.Elements)
         {
-            if (element is SchemaElement.EntityTypeElement ete)
+            if (element is EntityType et)
             {
-                foreach (var prop in ete.EntityType.Properties)
+                foreach (var prop in et.Properties)
                 {
                     count++;
                 }
@@ -58,7 +58,7 @@ public class EdmConsumptionBenchmarks
         {
             foreach (var elem in _schema.EntityContainer.Elements)
             {
-                if (elem is EntityContainerElement.EntitySetElement)
+                if (elem is EntitySet)
                 {
                     count++;
                 }
@@ -73,9 +73,9 @@ public class EdmConsumptionBenchmarks
         var count = 0;
         foreach (var element in _schema.Elements)
         {
-            if (element is SchemaElement.EntityTypeElement ete)
+            if (element is EntityType et)
             {
-                count += ete.EntityType.Keys.Count;
+                count += et.Keys.Count;
             }
         }
         return count;

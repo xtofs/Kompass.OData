@@ -49,17 +49,17 @@ internal sealed class SchemaView
 
         foreach (var element in model.Elements)
         {
-            if (element is SchemaElement.EntityTypeElement ete)
+            if (element is EntityType et)
             {
                 var containedNavs = new List<NavigationPropertyView>();
-                foreach (var nav in ete.EntityType.NavigationProperties)
+                foreach (var nav in et.NavigationProperties)
                 {
                     if (nav.ContainsTarget == true)
                     {
                         containedNavs.Add(new NavigationPropertyView(nav.Name, nav.Target.Name));
                     }
                 }
-                entityTypes.Add(new EntityTypeView(ete.EntityType.Name, containedNavs));
+                entityTypes.Add(new EntityTypeView(et.Name, containedNavs));
             }
         }
 
@@ -67,9 +67,9 @@ internal sealed class SchemaView
         {
             foreach (var elem in model.EntityContainer.Elements)
             {
-                if (elem is EntityContainerElement.EntitySetElement esElem)
+                if (elem is EntitySet esElem)
                 {
-                    entitySets.Add(new EntitySetView(esElem.EntitySet.Name, esElem.EntitySet.Target.Name));
+                    entitySets.Add(new EntitySetView(esElem.Name, esElem.Target.Name));
                 }
             }
         }
