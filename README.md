@@ -1,6 +1,40 @@
 # Kompass.OData
 
-A modular OData library suite for .NET. Each assembly is independently usable and focused on a single responsibility.
+A modular OData library suite for .NET, built around a **schema-first** philosophy.
+You define your data model in CSDL; the framework derives handler registrations from that schema and validates them for completeness—flagging entity sets or contained navigations that lack handlers before the service starts.
+Internally, the library cleanly separates a **syntactic CSDL tree** (where type references are plain strings) from a **semantic EDM model** (where every reference is resolved to a direct object link).
+A two-pass resolver bridges the two: the first pass registers all named elements, the second resolves every cross-reference—base types, navigation targets, partners, and bindings—into typed object pointers.
+Each assembly is independently usable and focused on a single responsibility.
+
+## Quick Example
+
+```csharp
+var csdl = File.ReadAllText("rooms.csdl.xml");
+
+var service = ODataServiceBuilder.FromCsdl<RoomsRepository>(csdl)
+    .EntitySet("Rooms", es => es
+        .OnList(ListRooms)                   // GET /Rooms
+        .OnGet(GetRoom)                      // GET /Rooms/{id}
+        .ContainedCollection("Printers", nav => nav
+            .OnList(ListPrinters)            // GET /Rooms/{id}/Printers
+            .OnGet(GetPrinter)));            // GET /Rooms/{id}/Printers/{id}
+
+service.MapODataEndpoints(app);
+```
+
+Handlers receive a typed context and the `TState` dependency from DI:
+
+```csharp
+static async Task<IResult> ListRooms(CollectionContext ctx, RoomsRepository repo)
+{
+    var (items, count) = await repo.GetRoomsAsync(
+        skip: (int?)ctx.Query.Page.Skip,
+        top:  (int?)ctx.Query.Page.Top);
+    return ctx.Ok(items.Cast<object>(), ctx.Query.Count == true ? count : null);
+}
+```
+
+See [`samples/`](samples/) for complete runnable examples.
 
 ## Assemblies
 
