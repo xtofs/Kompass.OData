@@ -2,7 +2,7 @@ namespace Kompass.CsdlEdm.Csdl;
 
 /// <summary>
 /// Base class for all schema-level element types (EntityType, ComplexType, EnumType, etc.).
-/// Uses a sealed hierarchy to model the Rust enum <c>SchemaElement</c>.
+/// Modeled as a sealed hierarchy.
 /// </summary>
 public abstract class SchemaElement
 {

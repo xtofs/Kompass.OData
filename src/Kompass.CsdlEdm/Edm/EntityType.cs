@@ -2,7 +2,7 @@ namespace Kompass.CsdlEdm.Edm;
 
 /// <summary>
 /// A resolved entity type with key properties, structural properties, and navigation properties.
-/// In C# we use direct object references instead of Rust's Arc/Weak/OnceLock pattern.
+/// Uses direct object references for navigation targets.
 /// </summary>
 public sealed class EntityType
 {

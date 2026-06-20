@@ -51,7 +51,7 @@ public sealed class Model
 }
 
 /// <summary>
-/// A resolved schema element. Sealed hierarchy mirroring the Rust <c>edm::SchemaElement</c>.
+/// A resolved schema element. Modeled as a sealed hierarchy.
 /// </summary>
 public abstract class SchemaElement
 {

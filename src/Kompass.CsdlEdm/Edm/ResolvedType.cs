@@ -2,7 +2,7 @@ namespace Kompass.CsdlEdm.Edm;
 
 /// <summary>
 /// A resolved type reference: primitive, enum, complex, or type-definition.
-/// Modeled as a sealed hierarchy mirroring the Rust <c>ResolvedType</c> enum.
+/// Modeled as a sealed hierarchy.
 /// </summary>
 public abstract class ResolvedType
 {

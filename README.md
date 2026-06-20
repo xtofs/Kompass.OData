@@ -1,6 +1,6 @@
 # Kompass.OData
 
-A modular OData library suite for .NET, ported from [odata-rs](https://github.com/xtofs/odata-rs). Each assembly is independently usable and mirrors the Rust crate decomposition.
+A modular OData library suite for .NET. Each assembly is independently usable and focused on a single responsibility.
 
 ## Assemblies
 

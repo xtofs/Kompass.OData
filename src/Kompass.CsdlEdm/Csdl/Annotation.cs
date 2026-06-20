@@ -13,7 +13,7 @@ public sealed class Annotation
 
 /// <summary>
 /// A CSDL annotation expression — constant, path, or dynamic.
-/// Modeled as a sealed hierarchy mirroring the Rust <c>CsdlAnnotationExpression</c> enum.
+/// Modeled as a sealed hierarchy.
 /// </summary>
 public abstract class CsdlAnnotationExpression
 {

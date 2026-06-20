@@ -2,7 +2,7 @@ namespace Kompass.CsdlEdm.Edm;
 
 /// <summary>
 /// One segment of a resolved binding path or target.
-/// Uses direct object references (GC handles cycles, unlike Rust's Weak refs).
+/// Uses direct object references (GC handles cycles natively).
 /// </summary>
 public abstract class BindingPathSegment
 {
