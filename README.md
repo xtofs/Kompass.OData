@@ -4,7 +4,8 @@ A modular OData library suite for .NET, built around a **schema-first** philosop
 You define your data model in CSDL; the framework derives handler registrations from that schema and validates them for completeness—flagging entity sets or contained navigations that lack handlers before the service starts.
 Internally, the library cleanly separates a **syntactic CSDL tree** (where type references are plain strings) from a **semantic EDM model** (where every reference is resolved to a direct object link).
 A two-pass resolver bridges the two: the first pass registers all named elements, the second resolves every cross-reference—base types, navigation targets, partners, and bindings—into typed object pointers.
-Each assembly is independently usable and focused on a single responsibility.
+Handler contexts form a small hierarchy (`CollectionContext`, `EntityContext`, `ContainedCollectionContext`, `ContainedEntityContext`) so each handler receives exactly the information its URL shape implies—keys, parent keys, navigation property, query options—without manual parsing.
+Each assembly is independently usable and focused on a single responsibility; see [ARCHITECTURE.md](ARCHITECTURE.md) for a deeper walkthrough.
 
 ## Quick Example
 
